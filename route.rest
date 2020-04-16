@@ -1,0 +1,23 @@
+GET http://localhost:2000/movie
+###
+GET http://localhost:4000/movie/5e84968f540cc1a7603723b9
+###
+POST http://localhost:4000/movie
+
+Content-Type: application/json
+
+{
+    "title":"Inja Bedone Man",
+    "rate":"6.1"
+}
+###
+GET http://localhost:2000/directory
+###
+GET http://localhost:2000/directory/1
+###
+GET http://localhost:2000/actor
+###
+GET http://localhost:2000/actor/1
+
+
+
