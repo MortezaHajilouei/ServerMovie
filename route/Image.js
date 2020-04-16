@@ -44,8 +44,9 @@ router.post('/:id',async(req,res)=>
             var existNow = false;
             var fstream;
             req.pipe(req.busboy);
-            req.busboy.on('file', function (fieldname, file, filename) {
-                dir = __dirname + '/DB/';
+            req.busboy.on('file', function (fieldname, file, filename) 
+            {
+                dir = __dirname + '/../../DB/';
                 filePath = dir + req.params.id;
                 if(fs.existsSync(filePath))
                 {
