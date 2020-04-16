@@ -1,33 +1,41 @@
 const express = require('express');
 const router = express.Router();
 
-const Person = require('../Controller/Person');
-const Movie = require('../Controller/Movie'); 
 const Image = require('../Controller/Image'); 
-const fs = require('fs');
+
+router.get('/' , async (req,res) =>{
+    try {
+        var rr = await Image.list();
+        res.status(200).json(rr);
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+});
+
+router.delete('/:id', async (req,res) => {
+    try {
+        let r = await Image.del(req.params.id);
+        res.status(200).json(r);
+    } catch (error) {
+        res.status(500).json({message:error.message});
+        
+    }
+});
 
 router.get('/:id', async (req,res) => {
     try{
-        let result = await Image.name(req.params.id);
-        if(result.length != 0)
+        let image = await Image.name(req.params.id);
+        if(image != null)
         {
-            image = result[0];
-            fs.exists(image.path, function(exists)
-            {
-                if (exists)
-                {
-                  res.writeHead(200, {
-                    "Content-Type": "application/octet-stream",
-                    "Content-Disposition": "attachment; filename=" + image.path
-                  });
-                  fs.createReadStream(image.path).pipe(res);
-                } 
-                else 
-                {
-                    res.status(400).json({message:"File does not exist"});
-                }
-              });
-        }else{
+            res.writeHead(200, {
+                "Content-Type": "application/octet-stream"
+            });
+            var buf = Buffer.from(image.img.data); // Ta-da
+            res.write(buf || 'Please reload page');
+            res.end();
+        }
+        else
+        {
             res.status(400).json({message:"File does not exist"});
         }
     }
@@ -36,51 +44,31 @@ router.get('/:id', async (req,res) => {
     }
 });
 
-router.post('/:id',async(req,res)=>
+router.post('/',async(req,res)=>
 {
-    try{
         if(req.busboy != undefined)
         {
-            var existNow = false;
-            var fstream;
             req.pipe(req.busboy);
-            req.busboy.on('file', function (fieldname, file, filename) 
+            req.busboy.on('file', async function (fieldname, file, filename) 
             {
-                dir = __dirname + '/../../DB/';
-                filePath = dir + req.params.id;
-                if(fs.existsSync(filePath))
-                {
-                    existNow = true;
-                    fs.unlinkSync(filePath);
-                }
-                fstream = fs.createWriteStream(filePath);
-                file.pipe(fstream);
-                fstream.on('close', async function ()
-                {
+                var buffers = [];
+                file.on('data', async function(buffer) {
+                  buffers.push(buffer);
+                });
+                file.on('end', async function() {
                     try{
-                        if(!existNow)
-                        {
-                            let rr = await Image.addOne({"path":filePath,"type":"jpg"});
-                            let rr2;
-                            if(fieldname == 'cover')
-                                rr2 = await Movie.update(req.params.id,{cover:rr._id});
-                            else
-                                rr2 = await Person.update(req.params.id,{cover:rr._id});
-                            res.status(201).json(rr2);
-                        }
-                        else{
-                            res.status(201).end();
-                        }
+                        var buffer = Buffer.concat(buffers);
+                        let rr = await Image.addOne({"name":fieldname,"data":buffer});
+                        res.status(201).json({_id:rr._id});
                     }
-                    catch(err){
-                        res.status(500).json({message:err});
+                    catch(err) {
+                        res.status(500).json({message:err.message});
                     }
                 });
+
             });
         }
-    } catch(err) {
-        res.status(500).json({message:err.message});
-    }
+    
 });
 
 

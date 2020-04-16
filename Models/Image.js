@@ -1,12 +1,13 @@
 const mongoose = require('mongoose')
 
-const imageSchema = new mongoose.Schema({
-    path:{
+var imageSchema = new mongoose.Schema({
+    name: {
         type:String,
         required:true
     },
-    contentType:{
-        type:String
+    img: { 
+        data: Buffer, 
+        contentType: String
     },
     modefiedTime:{
         type:Date,

@@ -1,12 +1,13 @@
 const Person = require('../Models/Person');
 
-async function list()
+async function GetAll(filter)
 {
-    let res = await Person.find();
-    return res;
+    if(filter != undefined)
+        return await Person.find({type:filter});
+    return await Person.find();
 }
 
-async function names(id)
+async function GetList(id)
 {
     let filter=[];
     for(i of id)
@@ -19,7 +20,7 @@ async function names(id)
 }
 
 
-async function name(id)
+async function GetInfo(id)
 {
     let res = await Person.findOne({_id:id});
     return res;
@@ -45,11 +46,15 @@ async function add(listDirectors,job)
     return dr;
 }
 
-async function update(id,result){
-  
+async function update(id,result)
+{
     let r = await Person.findOneAndUpdate({_id:id},result);
     return r;
 }
 
+async function del(id)
+{
+    return await Person.deleteOne({_id:id});    
+}
 
-module.exports = {list,name,add,names,update};
+module.exports = {GetAll,GetInfo,add,GetList,update,del};
