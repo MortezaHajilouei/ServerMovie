@@ -35,12 +35,11 @@ async function add(listDirectors,job)
         {
             let temp = new Person({name:item,type:job});
             let i = await temp.save();
-            dr.push(i._id);
-
+            dr.push(i);
         }
         else
         {
-            dr.push(temp[0]._id);
+            dr.push(temp[0]);
         }
     }
     return dr;

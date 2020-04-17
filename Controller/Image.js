@@ -30,8 +30,8 @@ async function name(id)
 async function addOne(it)
 {
     let temp = new Image;
-    temp.img.data = it.data;
     temp.name = it.name;
+    temp.img.data = it.data;
     temp.img,contentType = "";
     let i = await temp.save();
     return i;
@@ -45,9 +45,9 @@ async function add(listDirectors)
         let temp = new Image;
         temp.name = item.name;
         temp.img.data = item.data;
-        temp.img.contentType = 'image/png';
+        temp.img.contentType = '';
         let i = await temp.save();
-        dr.push(i._id);
+        dr.push(i);
     }
     return dr;
 }
